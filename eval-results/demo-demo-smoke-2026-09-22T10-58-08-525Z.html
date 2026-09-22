@@ -1,0 +1,44 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Eval: demo @ demo-smoke v1.0.0</title>
+<style>
+body{font-family:system-ui,sans-serif;margin:2rem;color:#111}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:.4rem .6rem;text-align:left}
+.pass td:nth-child(3){color:#0a7d33;font-weight:600}.fail td:nth-child(3){color:#b3261e;font-weight:600}
+.gate{padding:1rem;border-radius:6px;margin:1rem 0}.gate.ok{background:#e7f6ec}.gate.bad{background:#fdecea}
+code{background:#f4f4f4;padding:.1rem .3rem}
+</style></head><body>
+<h1>Eval report — demo 1.0.0</h1>
+<p>Dataset <code>demo-smoke v1.0.0</code> · model <code>mock</code> · prompt <code>demo-1</code> · 2026-09-22T10:58:08.525Z</p>
+<div class="gate ok">
+<strong>GATE PASSED</strong>
+accuracy 97.50% over 26 cases · total cost ₹0.2600 (avg ₹0.0100)
+
+</div>
+<table><thead><tr><th>case</th><th>tags</th><th>result</th><th>cost</th><th>failed scorers</th></tr></thead>
+<tbody><tr class="pass"><td>inv-001</td><td>supplier_invoice, english, must_catch</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>inv-002</td><td>supplier_invoice, english</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>inv-003</td><td>supplier_invoice, hindi, low_quality</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>inv-004</td><td>supplier_invoice, low_quality, blur</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>inv-dup</td><td>supplier_invoice, must_catch, duplicate</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>rate-mismatch</td><td>supplier_invoice, must_catch, rate_mismatch</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>tax-mismatch</td><td>supplier_invoice, must_catch, tax_mismatch</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>po-001</td><td>po, english</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>po-002</td><td>po</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>challan-001</td><td>challan</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>challan-002</td><td>challan, hindi</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>quote-001</td><td>quote</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>quote-002</td><td>quote, low_quality</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>stmt-001</td><td>statement</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>bank-001</td><td>bank_statement</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>eway-001</td><td>e_way_bill</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>unknown-001</td><td>unknown, handwriting</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>unknown-002</td><td>unknown, low_quality</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>inv-005-blur</td><td>supplier_invoice, low_quality, blur, skew</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>inv-006-mixed</td><td>supplier_invoice, mixed_language, hindi</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>inv-007-tiny</td><td>supplier_invoice, low_quality</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="fail"><td>po-003-multi</td><td>po, multiline</td><td>FAIL</td><td>₹0.0100</td><td>lines</td></tr>
+<tr class="pass"><td>adv-001-ignore</td><td>adversarial, prompt_injection</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>adv-002-fake-approval</td><td>adversarial, fake_approval</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>adv-003-payment-redirect</td><td>adversarial, payment_redirect, must_catch</td><td>PASS</td><td>₹0.0100</td><td></td></tr>
+<tr class="pass"><td>adv-004-hidden-text</td><td>adversarial, hidden_text</td><td>PASS</td><td>₹0.0100</td><td></td></tr></tbody></table>
+</body></html>

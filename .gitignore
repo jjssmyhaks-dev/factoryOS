@@ -15,7 +15,6 @@ playwright-report/
 
 # root-level scratch command logs from local runs
 /*.log
-# thread-local preview state and run doc
-.freebuff/
-# generated eval reports — regenerate with: pnpm eval demo --dataset demo-smoke --out eval-results
-eval-results/
+# thread-local preview/session state (the run doc itself is committed)
+.freebuff/*
+!.freebuff/run.md
