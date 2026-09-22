@@ -1,0 +1,61 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Stage to deploy (dev | staging | prod)"
+        required: true
+        type: choice
+        options: [dev, staging, prod]
+  push:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - "services/**"
+      - "packages/**"
+
+permissions:
+  id-token: write # GitHub OIDC → AWS (E0-S2: no long-lived keys)
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.stage || 'dev' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check AWS role is configured
+        id: role
+        env:
+          AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+        run: |
+          if [ -z "$AWS_ROLE_ARN" ]; then
+            echo "AWS_ROLE_ARN repo variable not set — skipping deploy (E0-S2 pending AWS accounts)."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure AWS credentials (OIDC)
+        if: steps.role.outputs.configured == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ap-south-1
+
+      - name: Deploy
+        if: steps.role.outputs.configured == 'true'
+        working-directory: infra
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: pnpm exec sst deploy --stage "${{ github.event.inputs.stage || 'dev' }}"

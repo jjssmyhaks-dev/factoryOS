@@ -1,0 +1,78 @@
+{
+  "Comment": "AGENT RUN (PRD §6.9) — GENERATED from packages/harness/src/transitions.ts; do not edit by hand; run: tsx scripts/generate-workflows.ts",
+  "StartAt": "running",
+  "States": {
+    "running": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "factory-ai-os-step",
+        "Payload": {
+          "run_id.$": "$.run_id",
+          "tenant_id.$": "$.tenant_id",
+          "target_state": "running"
+        }
+      },
+      "ResultPath": "$.step_result",
+      "TimeoutSeconds": 900,
+      "HeartbeatSeconds": 120,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 1,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "failed"
+        }
+      ],
+      "Next": "route_running"
+    },
+    "route_running": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "succeeded",
+          "Next": "succeeded"
+        },
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "failed",
+          "Next": "failed"
+        },
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "cancelled",
+          "Next": "cancelled"
+        }
+      ],
+      "Default": "invalid_transition"
+    },
+    "succeeded": {
+      "Type": "Succeed"
+    },
+    "failed": {
+      "Type": "Fail",
+      "Error": "failed",
+      "Cause": "terminal state: failed (alert is raised by the step handler)"
+    },
+    "cancelled": {
+      "Type": "Succeed"
+    },
+    "invalid_transition": {
+      "Type": "Fail",
+      "Error": "InvalidTransition",
+      "Cause": "step handler returned a successor that is not in the transition table"
+    }
+  }
+}

@@ -1,0 +1,400 @@
+{
+  "Comment": "ACTION LIFECYCLE (PRD §6.3) — GENERATED from packages/harness/src/transitions.ts; do not edit by hand; run: tsx scripts/generate-workflows.ts",
+  "StartAt": "proposed",
+  "States": {
+    "proposed": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "factory-ai-os-step",
+        "Payload": {
+          "action_id.$": "$.action_id",
+          "tenant_id.$": "$.tenant_id",
+          "target_state": "proposed"
+        }
+      },
+      "ResultPath": "$.step_result",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "failed"
+        }
+      ],
+      "Next": "route_proposed",
+      "TimeoutSeconds": 300,
+      "HeartbeatSeconds": 60
+    },
+    "route_proposed": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "policy_evaluated",
+          "Next": "policy_evaluated"
+        }
+      ],
+      "Default": "invalid_transition"
+    },
+    "policy_evaluated": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "factory-ai-os-step",
+        "Payload": {
+          "action_id.$": "$.action_id",
+          "tenant_id.$": "$.tenant_id",
+          "target_state": "policy_evaluated"
+        }
+      },
+      "ResultPath": "$.step_result",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "failed"
+        }
+      ],
+      "Next": "route_policy_evaluated",
+      "TimeoutSeconds": 300,
+      "HeartbeatSeconds": 60
+    },
+    "route_policy_evaluated": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "suggested_only",
+          "Next": "suggested_only"
+        },
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "pending_approval",
+          "Next": "pending_approval"
+        },
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "auto_approved",
+          "Next": "auto_approved"
+        },
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "shadow_recorded",
+          "Next": "shadow_recorded"
+        }
+      ],
+      "Default": "invalid_transition"
+    },
+    "pending_approval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "factory-ai-os-step",
+        "Payload": {
+          "action_id.$": "$.action_id",
+          "tenant_id.$": "$.tenant_id",
+          "target_state": "pending_approval",
+          "taskToken.$": "$$.Task.Token"
+        }
+      },
+      "ResultPath": "$.step_result",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.Timeout"
+          ],
+          "ResultPath": "$.error",
+          "Next": "expired"
+        },
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "failed"
+        }
+      ],
+      "Next": "route_pending_approval",
+      "TimeoutSeconds": 86400
+    },
+    "route_pending_approval": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "approved",
+          "Next": "approved"
+        },
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "rejected",
+          "Next": "rejected"
+        },
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "expired",
+          "Next": "expired"
+        }
+      ],
+      "Default": "invalid_transition"
+    },
+    "approved": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "factory-ai-os-step",
+        "Payload": {
+          "action_id.$": "$.action_id",
+          "tenant_id.$": "$.tenant_id",
+          "target_state": "approved"
+        }
+      },
+      "ResultPath": "$.step_result",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "failed"
+        }
+      ],
+      "Next": "route_approved",
+      "TimeoutSeconds": 300,
+      "HeartbeatSeconds": 60
+    },
+    "route_approved": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "executing",
+          "Next": "executing"
+        }
+      ],
+      "Default": "invalid_transition"
+    },
+    "auto_approved": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "factory-ai-os-step",
+        "Payload": {
+          "action_id.$": "$.action_id",
+          "tenant_id.$": "$.tenant_id",
+          "target_state": "auto_approved"
+        }
+      },
+      "ResultPath": "$.step_result",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "failed"
+        }
+      ],
+      "Next": "route_auto_approved",
+      "TimeoutSeconds": 300,
+      "HeartbeatSeconds": 60
+    },
+    "route_auto_approved": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "executing",
+          "Next": "executing"
+        }
+      ],
+      "Default": "invalid_transition"
+    },
+    "executing": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "factory-ai-os-step",
+        "Payload": {
+          "action_id.$": "$.action_id",
+          "tenant_id.$": "$.tenant_id",
+          "target_state": "executing"
+        }
+      },
+      "ResultPath": "$.step_result",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "failed"
+        }
+      ],
+      "Next": "route_executing",
+      "TimeoutSeconds": 300,
+      "HeartbeatSeconds": 60
+    },
+    "route_executing": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "executed",
+          "Next": "executed"
+        },
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "failed",
+          "Next": "failed"
+        }
+      ],
+      "Default": "invalid_transition"
+    },
+    "executed": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "factory-ai-os-step",
+        "Payload": {
+          "action_id.$": "$.action_id",
+          "tenant_id.$": "$.tenant_id",
+          "target_state": "executed"
+        }
+      },
+      "ResultPath": "$.step_result",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "failed"
+        }
+      ],
+      "Next": "route_executed",
+      "TimeoutSeconds": 300,
+      "HeartbeatSeconds": 60
+    },
+    "route_executed": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "reversed",
+          "Next": "reversed"
+        },
+        {
+          "Variable": "$.step_result.next",
+          "StringEquals": "verify_failed",
+          "Next": "verify_failed"
+        }
+      ],
+      "Default": "invalid_transition"
+    },
+    "suggested_only": {
+      "Type": "Succeed"
+    },
+    "rejected": {
+      "Type": "Succeed"
+    },
+    "expired": {
+      "Type": "Succeed"
+    },
+    "shadow_recorded": {
+      "Type": "Succeed"
+    },
+    "reversed": {
+      "Type": "Succeed"
+    },
+    "failed": {
+      "Type": "Fail",
+      "Error": "failed",
+      "Cause": "terminal state: failed (alert is raised by the step handler)"
+    },
+    "verify_failed": {
+      "Type": "Fail",
+      "Error": "verify_failed",
+      "Cause": "terminal state: verify_failed (alert is raised by the step handler)"
+    },
+    "invalid_transition": {
+      "Type": "Fail",
+      "Error": "InvalidTransition",
+      "Cause": "step handler returned a successor that is not in the transition table"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@factory/infra",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "dev": "sst dev",
+    "deploy": "sst deploy",
+    "remove": "sst remove"
+  },
+  "devDependencies": {
+    "sst": "^4.17.1",
+    "typescript": "^5.9.2"
+  }
+}

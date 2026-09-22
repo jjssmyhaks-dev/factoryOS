@@ -1,0 +1,44 @@
+{
+  "name": "factory-ai-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Factory AI OS — AI operations layer for Indian MSME manufacturers (serverless, AWS ap-south-1)",
+  "packageManager": "pnpm@11.10.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "eslint .",
+    "typecheck": "turbo run typecheck",
+    "test": "vitest run",
+    "test:unit": "vitest run --exclude \"**/*.int.test.ts\"",
+    "test:integration": "vitest run .int.test",
+    "test:coverage": "vitest run --coverage",
+    "eval": "tsx packages/evals/src/cli.ts",
+    "ci": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:policies",
+    "check:policies": "tsx scripts/check-serverless-policy.ts && tsx scripts/check-workflow-transitions.ts",
+    "check:rls": "tsx scripts/check-rls-policies.ts",
+    "check:secrets": "node scripts/run-gitleaks.mjs",
+    "check:commits": "node scripts/run-commitlint.mjs",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@eslint/js": "^9.33.0",
+    "@types/node": "^24.3.0",
+    "@types/pg": "^8.15.5",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^9.33.0",
+    "fast-check": "^4.2.0",
+    "globals": "^16.3.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.3",
+    "turbo": "^2.5.4",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.0",
+    "vitest": "^3.2.4"
+  }
+}

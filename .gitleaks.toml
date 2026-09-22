@@ -1,0 +1,30 @@
+title = "factory-ai-os gitleaks config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-bearer-token"
+description = "Generic bearer/access token in code"
+regex = '''(?i)(bearer|token|secret|api[_-]?key)\s*[:=]\s*["'][a-z0-9_\-\.]{20,["']}["']'''
+tags = ["key", "generic"]
+
+[[rules]]
+id = "aws-access-key-id"
+description = "AWS access key id"
+regex = '''AKIA[0-9A-Z]{16}'''
+tags = ["key", "aws"]
+
+[allowlist]
+description = "Allow test fixtures and example placeholders"
+paths = [
+  '''.*\.test\.ts$''',
+  '''.*fixtures.*''',
+  '''docs/.*''',
+  '''.*\.example$''',
+]
+regexes = [
+  '''example[_-]?(key|secret|token)''',
+  '''xxxxxxxx+''',
+  '''placeholder''',
+]

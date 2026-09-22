@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.turbo/
+.sst/
+coverage/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+test-results/
+playwright-report/
+
+# root-level scratch command logs from local runs
+/*.log
+# thread-local preview state and run doc
+.freebuff/
+# generated eval reports — regenerate with: pnpm eval demo --dataset demo-smoke --out eval-results
+eval-results/

@@ -1,0 +1,7 @@
+{
+  "extends": "../tsconfig.base.json",
+  "include": ["sst-globals.d.ts", "sst.config.ts", "stacks", "scripts"],
+  "compilerOptions": {
+    "types": ["node"]
+  }
+}
