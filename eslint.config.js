@@ -11,6 +11,7 @@ export default tseslint.config(
       "**/.turbo/**",
       "**/node_modules/**",
       "**/coverage/**",
+      "**/.next/**",
       "**/*.d.ts",
       "infra/.sst/**",
     ],
