@@ -1,9 +1,9 @@
 # Preview runbook — factory-ai-os
 
-The registered preview is a **standalone HTML page** (no dev server): the §7.4
-eval gate report produced by the project's own CLI. Every `apps/*` front-end is
-an explicit milestone stub (their `dev` scripts only `echo`), so there is no web
-UI to serve in M0 — the eval report is the richest viewable artifact.
+The registered preview is the **`apps/web` Next.js dev server** (customer
+console) on `http://localhost:3000`. The §7.4 eval gate report remains
+regenerable as a standalone HTML artifact and is also embedded live in the
+console at `/evals`.
 
 ## How to reproduce the artifacts
 
@@ -15,7 +15,7 @@ UI to serve in M0 — the eval report is the richest viewable artifact.
    ```
 
    Procedure note (fresh checkout): there are **no `.env` / `.env.local` files**
-   in this repository — nothing to copy from the main checkout for the report.
+   in this repository — nothing to copy from the main checkout.
 
 2. Regenerate the eval report (writes JSON + HTML under `./eval-results/`):
 
@@ -29,15 +29,43 @@ UI to serve in M0 — the eval report is the richest viewable artifact.
    - Exit code `0` = GATE PASSED; `1` = gate failure; `2` = usage/data error.
    - The page embeds the §7.4 gate banner, per-case pass/fail rows, scores
      and cost, all self-contained (inline CSS, no network requests).
+   - Committed reports in `eval-results/` are the ones the console's
+     `/evals` dashboard serves by default (newest first).
 
 ## How to run the server
 
-**No server is required** — the registered preview uses static `htmlPath`
-mode pointing at the generated report above.
+Dev server for the console (from the repo root):
 
-For completeness: `pnpm dev` (→ `turbo run dev`) executes the placeholder
-`dev` scripts in `apps/web`, `apps/operator-pwa` and `apps/ops-console`,
-which only print where those apps land (E12 / E25 / E13) — nothing listens
-on a port today. The backend services are HTTP servers (`pnpm --filter
-@factory/api dev` etc., env-dependent) but nothing in the Preview relies on
-them.
+```sh
+pnpm --filter @factory/web dev     # next dev, defaults to port 3000
+```
+
+- **Port:** Next.js default `3000`. If it is busy, set `PORT=<n>` in the
+  environment before starting. Beware: a stray `PORT=0` in the shell makes
+  Next bind an ephemeral port — pin `PORT=3000` explicitly if the preview
+  URL must be stable.
+- **Routes:** `/` overview, `/evals` live gate dashboard (Run eval button,
+  watch toggle, embedded newest report), API routes `/api/eval/run`,
+  `/api/eval/watch`, `/api/eval/report`.
+- **No env vars required** — the eval runner shells out to
+  `pnpm eval demo ...` in the repo, no keys needed.
+
+Detached start (Windows PowerShell, survives the session; stdout/stderr
+must be **different** files):
+
+```powershell
+$env:PORT='3000'
+(Start-Process -FilePath 'npm.cmd' -ArgumentList 'run','dev' `
+  -WorkingDirectory '<repo>\apps\web' `
+  -RedirectStandardOutput '<repo>\.freebuff\preview.log' `
+  -RedirectStandardError  '<repo>\.freebuff\preview.log.err' `
+  -WindowStyle Hidden -PassThru).Id
+```
+
+Health check: `GET http://127.0.0.1:3000/` should answer `200` (probe with
+plain Node `http` — some local `curl` setups refuse localhost).
+
+The backend services (`pnpm --filter @factory/api dev` etc.) are separate
+env-dependent HTTP servers; nothing in the preview relies on them.
+`pnpm dev` at the root runs `turbo run dev`, which also starts the
+remaining milestone stubs (`operator-pwa`, `ops-console` — echo-only).
